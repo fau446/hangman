@@ -1,6 +1,14 @@
+# 6 guesses
+
 module Hangman
   class Player
+    def initialize
 
+    end
+
+    def guess_letter
+      
+    end
   end
 
   class Game
@@ -10,8 +18,25 @@ module Hangman
 
     def play
       # randomly selects a word
-      selected_word = select_random_word
-      
+      answer = select_random_word
+      p answer # used for testing, get rid after
+      display = Array.new(answer.length, '_')
+      p display
+      guesses = 0
+      while guesses < 6
+        # display the display first
+        print_array(display)
+        player_guess = @player.guess_letter
+        # check the letter in the guess is in the array
+        # break if word is guessed correctly
+        guesses += 1
+      end
+
+      if guesses >= 6
+        # game is lost
+      else
+        # game is won
+      end
     end
 
     private
@@ -27,10 +52,19 @@ module Hangman
           filtered_words.push(word)
         end
       end
-      
+      # do File.close  ?
       filtered_words.sample
     end
 
+    def print_array(array)
+      array = array.join(' ')
+      puts array
+    end
+
+
+    def check_guess
+
+    end
   end
 end
 
