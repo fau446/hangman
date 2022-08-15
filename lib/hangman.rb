@@ -2,32 +2,41 @@
 
 module Hangman
   class Game
+    def initialize
+      @answer
+      @display
+      @letters_guessed = Array.new
+    end
+
+    def test
+      @answer = select_random_word
+      p @answer
+    end
+
     def play
       # randomly selects a word
-      answer = select_random_word
-      answer = answer.split('')
-      p answer
-      display = Array.new(answer.length, '_')
-      letters_guessed = Array.new
+      @answer = select_random_word
+      @answer = @answer.split('')
+      @display = Array.new(@answer.length, '_')
       guesses_left = 6
       while guesses_left > 0
         # display the display first
         puts "\n"
-        print_array(display)
+        print_array(@display)
         # print out which letters have been guessed
         puts 'Letters already guessed:'
-        print_array(letters_guessed)
+        print_array(@letters_guessed)
         puts "You have #{guesses_left} guesses left."
         puts "\n"
         loop do
           player_guess = guess_letter
-          if valid_guess?(player_guess, letters_guessed)
-            letters_guessed.push(player_guess)
+          if valid_guess?(player_guess, @letters_guessed)
+            @letters_guessed.push(player_guess)
             # if correct guess
-            if correct_guess?(player_guess, answer)
+            if correct_guess?(player_guess, @answer)
               # put correct letter into display
-              answer.each_with_index do |letter, index|
-                display[index] = letter if letter == player_guess
+              @answer.each_with_index do |letter, index|
+                @display[index] = letter if letter == player_guess
               end
             else
               puts "Sorry, the letter #{player_guess} is not in the word."
@@ -40,10 +49,10 @@ module Hangman
         end
 
         # break if word is guessed correctly
-        break if display == answer
+        break if @display == @answer
       end
 
-      puts "The word was #{answer.join('')}."
+      puts "The word was #{@answer.join('')}."
       if guesses_left == 0
         puts 'You lost!'
       else
