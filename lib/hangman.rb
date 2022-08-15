@@ -1,37 +1,26 @@
 # 6 guesses
 
 module Hangman
-  class Player
-    def initialize
-
-    end
-
-    def guess_letter
-      puts "Input your guess: "
-      guess = gets.chomp.downcase
-    end
-  end
-
   class Game
-    def initialize
-      @player = Player.new
-    end
-
     def play
       # randomly selects a word
       answer = select_random_word
-      p answer # used for testing, get rid after
       answer = answer.split('')
+      p answer
       display = Array.new(answer.length, '_')
       letters_guessed = Array.new
       guesses_left = 6
       while guesses_left > 0
         # display the display first
+        puts "\n"
         print_array(display)
         # print out which letters have been guessed
+        puts 'Letters already guessed:'
         print_array(letters_guessed)
+        puts "You have #{guesses_left} guesses left."
+        puts "\n"
         loop do
-          player_guess = @player.guess_letter
+          player_guess = guess_letter
           if valid_guess?(player_guess, letters_guessed)
             letters_guessed.push(player_guess)
             # if correct guess
@@ -41,24 +30,24 @@ module Hangman
                 display[index] = letter if letter == player_guess
               end
             else
-              puts "Sorry, #{player_guess} is not in the word."
+              puts "Sorry, the letter #{player_guess} is not in the word."
+              guesses_left -= 1
             end
             break
           end
           puts "Sorry, that was an invalid input."
           puts "Please type in a letter that has not been guessed before."
         end
-        # check the letter in the guess is in the array
 
         # break if word is guessed correctly
         break if display == answer
-        guesses_left -= 1
       end
 
+      puts "The word was #{answer.join('')}."
       if guesses_left == 0
-        # game is lost
+        puts 'You lost!'
       else
-        # game is won
+        puts 'You won!'
       end
     end
 
@@ -82,6 +71,11 @@ module Hangman
     def print_array(array)
       array = array.join(' ')
       puts array
+    end
+
+    def guess_letter
+      puts "Input your guess: "
+      gets.chomp.downcase
     end
 
 
