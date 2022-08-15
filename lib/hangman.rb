@@ -1,16 +1,15 @@
+require 'yaml'
 # 6 guesses
 
 module Hangman
   class Game
+    attr_accessor :answer, :display, :letters_guessed
+
     def initialize
       @answer
       @display
       @letters_guessed = Array.new
-    end
-
-    def test
-      @answer = select_random_word
-      p @answer
+      @guesses_left
     end
 
     def play
@@ -18,15 +17,15 @@ module Hangman
       @answer = select_random_word
       @answer = @answer.split('')
       @display = Array.new(@answer.length, '_')
-      guesses_left = 6
-      while guesses_left > 0
+      @guesses_left = 6
+      while @guesses_left > 0
         # display the display first
         puts "\n"
         print_array(@display)
         # print out which letters have been guessed
         puts 'Letters already guessed:'
         print_array(@letters_guessed)
-        puts "You have #{guesses_left} guesses left."
+        puts "You have #{@guesses_left} guesses left."
         puts "\n"
         loop do
           player_guess = guess_letter
@@ -40,12 +39,18 @@ module Hangman
               end
             else
               puts "Sorry, the letter #{player_guess} is not in the word."
-              guesses_left -= 1
+              @guesses_left -= 1
             end
             break
+          else
+            if player_guess == '@'
+              save_game(@answer, @display, @letters_guessed, @guesses_left)
+              puts 'Game is saved!'
+              next
+            end
+            puts "Sorry, that was an invalid input."
+            puts "Please type in a letter that has not been guessed before."
           end
-          puts "Sorry, that was an invalid input."
-          puts "Please type in a letter that has not been guessed before."
         end
 
         # break if word is guessed correctly
@@ -53,7 +58,7 @@ module Hangman
       end
 
       puts "The word was #{@answer.join('')}."
-      if guesses_left == 0
+      if @guesses_left == 0
         puts 'You lost!'
       else
         puts 'You won!'
@@ -83,10 +88,9 @@ module Hangman
     end
 
     def guess_letter
-      puts "Input your guess: "
+      puts "Input your guess, or input @ to save: "
       gets.chomp.downcase
     end
-
 
     def valid_guess?(guess, letters_guessed)
       # false if guess.length != 1
@@ -100,10 +104,29 @@ module Hangman
       return true if answer.include? guess
       false
     end
+
+    def save_game(answer, display, letters_guessed, guesses_left)
+      to_save = Hash.new
+      to_save[:answer] = answer
+      to_save[:display] = display
+      to_save[:letters_guessed] = letters_guessed
+      to_save[:guesses_left] = guesses_left
+      File.open("save.yml", "w") { |file| file.write(to_save.to_yaml) }
+    end
+
   end
 end
 
 include Hangman
 
 game = Game.new
+#game.answer = 'This is a string'
+#game.display = ["display", "array"]
+#game.letters_guessed = ["letters", "array"]
+#File.open("save.yml", "w") { |file| file.write(game.to_yaml)}
+
+save_file = YAML.load(File.read("save.yml"))
+game.answer = save_file[:answer]
+p game.answer
+
 game.play
