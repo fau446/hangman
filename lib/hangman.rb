@@ -18,6 +18,9 @@ module Hangman
       @answer = @answer.split('')
       @display = Array.new(@answer.length, '_')
       @guesses_left = 6
+      puts 'Input r to load the save file, or any other key to start a new game!'
+      save_file_input = gets.chomp.downcase
+      load_game if save_file_input == 'r'
       while @guesses_left > 0
         # display the display first
         puts "\n"
@@ -114,6 +117,18 @@ module Hangman
       File.open("save.yml", "w") { |file| file.write(to_save.to_yaml) }
     end
 
+    def load_game
+      begin
+        save_file = YAML.load(File.read("save.yml"))
+        @answer = save_file[:answer]
+        @display = save_file[:display]
+        @letters_guessed = save_file[:letters_guessed]
+        @guesses_left = save_file[:guesses_left]
+      rescue
+        puts 'The save file was unable to be loaded, starting new game instead.'
+      end
+    end
+
   end
 end
 
@@ -125,8 +140,8 @@ game = Game.new
 #game.letters_guessed = ["letters", "array"]
 #File.open("save.yml", "w") { |file| file.write(game.to_yaml)}
 
-save_file = YAML.load(File.read("save.yml"))
-game.answer = save_file[:answer]
-p game.answer
+#save_file = YAML.load(File.read("save.yml"))
+#game.answer = save_file[:answer]
+#p game.answer
 
 game.play
